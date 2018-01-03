@@ -4,10 +4,12 @@ import time
 import random
 import math
 import pygame
+import colors
 from pygame.locals import *
 from utils import *
 from models import *
 from sqliteHelper import *
+from gameMenu import *
 
 
 def calc_velocity(direction, vel=1.0):
@@ -41,7 +43,12 @@ pygame.display.set_caption("RPG")
 font = pygame.font.Font(None, 36)
 timer = pygame.time.Clock()
 
-monsters = getAllCharacterType()
+
+
+#enterMenu(pygame,screen,font,timer)
+
+
+monsters = getAllMonster()
 # 讀取遊戲紀錄
 gameRecord = getGameRecordByID(1)
 # 讀取腳色資料
