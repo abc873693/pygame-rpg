@@ -79,7 +79,7 @@ class CharacterSprite(pygame.sprite.Sprite):
 
 class MonsterSprite(pygame.sprite.Sprite):
 
-    def __init__(self, monsterData, x, y, direction):
+    def __init__(self,monsterData):
         pygame.sprite.Sprite.__init__(self)  # extend the base Sprite class
         self.master_image = None
         self.frame = 0
@@ -92,8 +92,8 @@ class MonsterSprite(pygame.sprite.Sprite):
         self.last_time = 0
         self.direction = 0
         self.velocity = Point(0.0, 0.0)
-        self.data = monsterData
-        fileNmae = 'images/character/%s' % (characterTypeData.imageName)
+        self.monsterData = monsterData
+        fileNmae = 'images/monster/%s' % (monsterData.imageName)
         self.load(fileNmae, 32, 32, 4)
         self.position = x, y
         self.direction = direction
@@ -203,7 +203,7 @@ class MonsterData():
 
     def __init__(self, ID, Name, ImageName, HP, Attack, ImageStartX, ImageStartY):
         self.ID = ID
-        self.bame = Name
+        self.name = Name
         self.imageName = ImageName
         self.HP = HP
         self.attack = Attack

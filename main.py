@@ -54,6 +54,8 @@ gameRecord = getGameRecordByID(1)
 # 讀取腳色資料
 characterType = getCharacterTypedByID(gameRecord.characterTypeID)
 
+
+
 print(characterType.name)
 
 print(monsters[0])
@@ -68,9 +70,8 @@ player_group.add(player)
 
 # 初始化food精靈組
 for n in range(1, 10):
-    food = MySprite()
-    food.load("images/food_low.png", 35, 35, 1)
-    food.position = random.randint(0, 780), random.randint(0, 580)
+    food = MonsterSprite(monsters)
+    # food.position = random.randint(0, 780), random.randint(0, 580)
     food_group.add(food)
 
 game_over = False
