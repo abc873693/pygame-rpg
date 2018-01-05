@@ -1,5 +1,6 @@
 import pygame
 import random
+import sqliteHelper
 from pygame.locals import *
 
 
@@ -22,9 +23,9 @@ class CharacterSprite(pygame.sprite.Sprite):
         self.gameRecord = gameRecord
         self.characterTypeData = characterTypeData
         fileNmae = 'images/character/%s' % (characterTypeData.imageName)
-        self.load(fileNmae, 32, 32, 4)
+        self.load(fileNmae, 42, 37, 4)
         self.position = (gameRecord.currentX, gameRecord.currentY)
-        self.direction = gameRecord.currentDirection
+        #self.direction = gameRecord.currentDirection
 
     # X property
     def _getx(self): return self.rect.x
@@ -93,10 +94,10 @@ class MonsterSprite(pygame.sprite.Sprite):
         self.direction = 0
         self.velocity = Point(0.0, 0.0)
         self.monsterData = monsterData
-        fileNmae = 'images/monster/%s' % (monsterData.imageName)
+        fileNmae = 'images/monster/%s'  % (monsterData.imageName)
         self.load(fileNmae, 32, 32, 4)
-        self.position = x, y
-        self.direction = direction
+        self.position = (monsterData.imageStartX, monsterData.imageStartY)
+        self.direction = 1 #direction
 
     # X property
     def _getx(self): return self.rect.x
