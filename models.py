@@ -220,3 +220,13 @@ class MonsterRecordData():
         self.currentHP = CurrentHP
         self.currentX = CurrentX
         self.currentY = CurrentY
+
+class TextData():
+    def __init__(self, x, y, text, color):
+        self.x = x
+        self.y = y
+        self.text = text
+        self.color = color
+    
+    def getTextSize():
+        return len(self.text)

@@ -40,12 +40,43 @@ def calc_velocity(direction, vel=1.0):
 pygame.init()
 screen = pygame.display.set_mode((800, 600))
 pygame.display.set_caption("RPG")
-font = pygame.font.Font(None, 36)
+font = pygame.font.Font("fonts/msjh.ttf", 36)
 timer = pygame.time.Clock()
 
+menu_state = 1
+game_over = False
 
-
-#enterMenu(pygame,screen,font,timer)
+while menu_state != 0:
+    #主畫面
+    if menu_state == 1:
+        print('主畫面')
+        position = enterMenu(pygame,screen,font,timer)
+        print('position',position)
+        menu_state = position + 2
+        print('menu_state',menu_state)
+    #新遊戲
+    elif menu_state == 2:
+        print('新遊戲')
+        position = enterNewGame(pygame,screen,font,timer)
+        if position == -1:
+            menu_state = 1
+    #載入遊戲
+    elif menu_state == 3:
+        print('載入遊戲')
+        position = enterLoadGame(pygame,screen,font,timer)
+        if position == -1:
+            menu_state = 1
+    #排行榜
+    elif menu_state == 4:
+        print('排行榜')
+        position = enterLoadRank(pygame,screen,font,timer)
+        if position == -1:
+            menu_state = 1
+    #離開
+    elif menu_state == 5:
+        menu_state = 0
+        print('離開')
+        game_over = True
 
 
 monsters = getAllMonster()
@@ -70,16 +101,16 @@ player_group.add(player)
 
 # 初始化food精靈組
 for n in range(1, 10):
-    food = MonsterSprite(monsters)
+    food = MonsterSprite(monsters[0])
     # food.position = random.randint(0, 780), random.randint(0, 580)
     food_group.add(food)
 
-game_over = False
+
 player_moving = False
 player_health = 0
 time = 0
 
-while True:
+while not game_over:
     timer.tick(30)
     time = time + 1
     ticks = pygame.time.get_ticks()
