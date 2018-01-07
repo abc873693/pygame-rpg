@@ -84,7 +84,7 @@ print(monsters[0])
 
 # 創建精靈組
 player_group = pygame.sprite.Group()
-food_group = pygame.sprite.Group()
+monster_group = pygame.sprite.Group()
 
 # 初始化玩家精靈組
 player = CharacterSprite(gameRecord, characterType)
@@ -94,7 +94,7 @@ player_group.add(player)
 for n in range(1, 2):
     food = MonsterSprite(monsters[1])
     # food.position = random.randint(0, 780), random.randint(0, 580)
-    food_group.add(food)
+    #monster_group.add(food)
 
 
 player_moving = False
@@ -167,22 +167,23 @@ while not game_over:
 
         # 檢測玩家是否與食物衝突，是否吃到果實
         attacker = None
-        attacker = pygame.sprite.spritecollideany(player, food_group)
+        attacker = pygame.sprite.spritecollideany(player, monster_group)
         if attacker != None:
             if pygame.sprite.collide_circle_ratio(0.65)(player, attacker):
                 player_health += 50
-                food_group.remove(attacker)
+                monster_group.remove(attacker)
         if player_health > 100:
             player_health = 100
         # 更新食物精靈組
-        food_group.update(ticks, 50)
-        if len(food_group) == 0:
-            game_over = True
+        monster_group.update(ticks, 50)
+        # if len(monster_group) == 0:
+        #     pass
+        #     game_over = True
     # 清除畫面
     screen.fill((50, 50, 100))
 
     # 繪製精靈
-    food_group.draw(screen)
+    monster_group.draw(screen)
     player_group.draw(screen)
 
     # 繪製玩家血量條
