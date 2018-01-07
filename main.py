@@ -5,6 +5,7 @@ import random
 import math
 import pygame
 import colors
+import sqliteHelper
 from pygame.locals import *
 from utils import *
 from models import *
@@ -14,26 +15,18 @@ from gameMenu import *
 
 def calc_velocity(direction, vel=1.0):
     velocity = Point(0, 0)  # 速度
-    if direction == 0:  # 上
-        velocity.y = -vel
-    elif direction == 1:  # 右上
-        velocity.x = vel
-        velocity.y = -vel
+    if direction == 0:  #下
+        velocity.y = vel
+
+    elif direction == 1:  # 左
+        velocity.x = -vel
+    
     elif direction == 2:  # 右
         velocity.x = vel
-    elif direction == 3:  # 右下
-        velocity.x = vel
-        velocity.y = vel
-    elif direction == 4:  # 下
-        velocity.y = vel
-    elif direction == 5:  # 右
-        velocity.x = -vel
-        velocity.y = vel
-    elif direction == 6:  # 左
-        velocity.x = -vel
-    elif direction == 7:  # 右
-        velocity.x = -vel
+    
+    elif direction == 3:  # 上
         velocity.y = -vel
+    
     return velocity
 
 
@@ -52,7 +45,7 @@ while menu_state != 0:
         print('主畫面')
         position = enterMenu(pygame,screen,font,timer)
         print('position',position)
-        menu_state = position + 2
+        menu_state = 0
         print('menu_state',menu_state)
     #新遊戲
     elif menu_state == 2:
@@ -78,7 +71,6 @@ while menu_state != 0:
         print('離開')
         game_over = True
 
-
 monsters = getAllMonster()
 # 讀取遊戲紀錄
 gameRecord = getGameRecordByID(1)
@@ -88,7 +80,6 @@ characterType = getCharacterTypedByID(gameRecord.characterTypeID)
 
 
 print(characterType.name)
-
 print(monsters[0])
 
 # 創建精靈組
@@ -100,8 +91,8 @@ player = CharacterSprite(gameRecord, characterType)
 player_group.add(player)
 
 # 初始化food精靈組
-for n in range(1, 10):
-    food = MonsterSprite(monsters[0])
+for n in range(1, 2):
+    food = MonsterSprite(monsters[1])
     # food.position = random.randint(0, 780), random.randint(0, 580)
     food_group.add(food)
 
@@ -120,32 +111,26 @@ while not game_over:
             pygame.quit()
             sys.exit()
     keys = pygame.key.get_pressed()
+
     if keys[K_ESCAPE]:
         sys.exit()
-    elif keys[K_UP] or keys[K_w]:
+   
+    elif keys[K_DOWN] or keys[K_s]:
         player.direction = 0
         player_moving = True
-    elif keys[K_e]:
+    
+    elif keys[K_LEFT] or keys[K_a]:
         player.direction = 1
         player_moving = True
+
     elif keys[K_RIGHT] or keys[K_d]:
         player.direction = 2
         player_moving = True
-    elif keys[K_c]:
+
+    elif keys[K_UP] or keys[K_w]:
         player.direction = 3
         player_moving = True
-    elif keys[K_DOWN] or keys[K_s]:
-        player.direction = 4
-        player_moving = True
-    elif keys[K_z]:
-        player.direction = 5
-        player_moving = True
-    elif keys[K_LEFT] or keys[K_a]:
-        player.direction = 6
-        player_moving = True
-    elif keys[K_q]:
-        player.direction = 7
-        player_moving = True
+    
     else:
         player_moving = False
 
@@ -191,7 +176,6 @@ while not game_over:
             player_health = 100
         # 更新食物精靈組
         food_group.update(ticks, 50)
-
         if len(food_group) == 0:
             game_over = True
     # 清除畫面
