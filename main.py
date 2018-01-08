@@ -91,10 +91,10 @@ player = CharacterSprite(gameRecord, characterType)
 player_group.add(player)
 
 # 初始化food精靈組
-for n in range(1, 2):
+for n in range(1, 5):
     food = MonsterSprite(monsters[1])
     # food.position = random.randint(0, 780), random.randint(0, 580)
-    #monster_group.add(food)
+    monster_group.add(food)
 
 
 player_moving = False
@@ -134,8 +134,9 @@ while not game_over:
     else:
         player_moving = False
 
+
     if not game_over:
-        # 根據角色的不同方向，使用不同的動畫幀
+    # 根據角色的不同方向，使用不同的動畫幀
         player.first_frame = player.direction * player.columns
         player.last_frame = player.first_frame + player.columns - 1
         if player.frame < player.first_frame:
@@ -149,6 +150,7 @@ while not game_over:
             player.velocity.x *= 3
             player.velocity.y *= 3
 
+
         # 更新玩家精靈組
         player_group.update(ticks, 50)
 
@@ -158,12 +160,13 @@ while not game_over:
             player.Y += player.velocity.y
             if player.X < -10:
                 player.X = -10
-            elif player.X > 800:
-                player.X = 800
+            elif player.X > 780:
+                player.X = 780
             if player.Y < -10:
                 player.Y = -10
-            elif player.Y > 600:
-                player.Y = 600
+            elif player.Y > 580:
+                player.Y = 580
+
 
         # 檢測玩家是否與食物衝突，是否吃到果實
         attacker = None
@@ -174,8 +177,10 @@ while not game_over:
                 monster_group.remove(attacker)
         if player_health > 100:
             player_health = 100
+
         # 更新食物精靈組
         monster_group.update(ticks, 50)
+
         # if len(monster_group) == 0:
         #     pass
         #     game_over = True
