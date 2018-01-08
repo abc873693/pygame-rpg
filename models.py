@@ -1,6 +1,7 @@
 import pygame
 import random
 from pygame.locals import *
+#from sqliteHelper import *
 
 
 # CharacterSprite class extends pygame.sprite.Sprite
@@ -22,7 +23,7 @@ class CharacterSprite(pygame.sprite.Sprite):
         self.gameRecord = gameRecord
         self.characterTypeData = characterTypeData
         fileNmae = 'images/character/%s' % (characterTypeData.imageName)
-        self.load(fileNmae, 32, 32, 4)
+        self.load(fileNmae, 28, 32, 4)
         self.position = (gameRecord.currentX, gameRecord.currentY)
         self.direction = gameRecord.currentDirection
 
@@ -64,8 +65,10 @@ class CharacterSprite(pygame.sprite.Sprite):
 
         # build current frame only if it changed
         if self.frame != self.old_frame:
+            print(self.characterTypeData.imageName)
             frame_x = (self.frame % self.columns) * self.frame_width
             frame_y = (self.frame // self.columns) * self.frame_height
+            print(("%d %d %d %d" % (frame_x, frame_y, self.frame_width, self.frame_height)))
             rect = Rect(frame_x, frame_y, self.frame_width, self.frame_height)
             self.image = self.master_image.subsurface(rect)
             self.old_frame = self.frame
@@ -197,7 +200,14 @@ class GameRecordData():
         self.currentX = CurrentX
         self.currentY = CurrentY
         self.currentDirection = CurrentDirection
-
+    # def getChracterType():
+    #     return getCharacterTypedByID(self.characterTypeID)
+class GameData():
+    #為了選角用
+    def __init__(self, CurrentX, CurrentY, CurrentDirection):
+        self.currentX = CurrentX
+        self.currentY = CurrentY
+        self.currentDirection = CurrentDirection
 
 class MonsterData():
 

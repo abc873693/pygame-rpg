@@ -58,23 +58,50 @@ def enterMenu(pygame, screen, font, timer):
             mode = 0
         # 清除畫面
         screen.fill((50, 50, 100))
-        #繪製
+        # 繪製
         for textData in textList:
             print_text(font, textData.x, textData.y,
                        textData.text, colors.white)
-        #print(textList[position].getTextSize())
+        # print(textList[position].getTextSize())
         pygame.draw.rect(screen, (100, 200, 100, 180),
                          Rect(textList[position].x, textList[position].y, (4 * 36), 50), 2)
         pygame.display.update()
 
-#新遊戲
+# 新遊戲
+
+
 def enterNewGame(pygame, screen, font, timer):
-    max = 3
+    font_small = pygame.font.Font("fonts/msjh.ttf", 24)
+    # max = 3
     mode = 0
     position = 0
     key_pressing = False
+    characterTypeList = getAllCharacterType(CharacterTypeData)
+    # print(characterType.name)
+    imageDataList = []
     textList = []
-    textList.append(TextData(100, 100, '新遊戲', colors.white))
+    textSmallList = []
+    startX = 100
+    startY = 100
+    characterTypeGroup = pygame.sprite.Group()
+    textList.append(TextData(100, 100, '請選擇角色', colors.white))
+    i = 0
+    for characterType in characterTypeList:
+        offsetX = 150 * i
+        gameRecordData = GameData(startX + offsetX ,startY ,3)
+        characterTypeGroup.add(CharacterSprite(gameRecordData, characterType))
+        textSmallList.append(TextData(startX + offsetX, startY +
+                                 100, characterType.name, colors.white))
+        textSmallList.append(TextData(startX + offsetX, startY + 130,
+                                 'HP:' + str(characterType.initHP), colors.white))
+        textSmallList.append(TextData(startX + offsetX, startY + 160,
+                                 '攻擊力:' + str(characterType.initAttack), colors.white))
+        i = i + 1
+        if i == 3:
+            startY = startY + 300
+            i = 0
+
+    max = len(textList)
     while True:
         print(position)
         timer.tick(30)
@@ -112,17 +139,24 @@ def enterNewGame(pygame, screen, font, timer):
             return position
         else:
             mode = 0
+        characterTypeGroup.update(ticks, 50)
         # 清除畫面
         screen.fill((50, 50, 100))
-        #繪製
+        characterTypeGroup.draw(screen)
+        # 繪製
         for textData in textList:
             print_text(font, textData.x, textData.y,
+                       textData.text, colors.white)
+        for textData in textSmallList:
+            print_text(font_small, textData.x, textData.y,
                        textData.text, colors.white)
         pygame.draw.rect(screen, (100, 200, 100, 180),
                          Rect(textList[position].x, textList[position].y, (4 * 36), 50), 2)
         pygame.display.update()
 
-#新遊戲
+# 載入遊戲
+
+
 def enterLoadGame(pygame, screen, font, timer):
     max = 3
     mode = 0
@@ -170,7 +204,7 @@ def enterLoadGame(pygame, screen, font, timer):
             mode = 0
         # 清除畫面
         screen.fill((50, 50, 100))
-        #繪製
+        # 繪製
         for textData in textList:
             print_text(font, textData.x, textData.y,
                        textData.text, colors.white)
@@ -178,15 +212,37 @@ def enterLoadGame(pygame, screen, font, timer):
                          Rect(textList[position].x, textList[position].y, (4 * 36), 50), 2)
         pygame.display.update()
 
-#排行榜
+# 排行榜
+
+
 def enterLoadRank(pygame, screen, font, timer):
     max = 3
     mode = 0
     position = 0
     key_pressing = False
     gameRecordList = getAllGameRecord()
+    # print sorted(gameRecordList, key=lambda gameRecordList: gameRecordList[].experience))
+    startX = 200
+    startY = 200
     textList = []
     textList.append(TextData(100, 100, '排行榜', colors.white))
+    textList.append(TextData(100, 150, '名稱', colors.white))
+    textList.append(TextData(300, 150, '角色', colors.white))
+    textList.append(TextData(550, 150, '等級', colors.white))
+    i = 0
+    for gameRecord in gameRecordList :
+        offsetY = 50 * i
+        i = i+1
+        textList.append(TextData(100, startY + offsetY, gameRecord.characterName, colors.white))
+
+    textList.append(TextData(300, 200, '我是角色名稱', colors.white))
+    textList.append(TextData(550, 200, str(
+        gameRecordList[0].experience), colors.white))
+    textList.append(TextData(550, 250, str(
+        gameRecordList[1].experience), colors.white))
+    textList.append(TextData(550, 300, str(
+        gameRecordList[2].experience), colors.white))
+
     max = len(gameRecordList)
     while True:
         print(position)
@@ -226,10 +282,8 @@ def enterLoadRank(pygame, screen, font, timer):
             mode = 0
         # 清除畫面
         screen.fill((50, 50, 100))
-        #繪製
+        # 繪製
         for textData in textList:
             print_text(font, textData.x, textData.y,
                        textData.text, colors.white)
-        pygame.draw.rect(screen, (100, 200, 100, 180),
-                         Rect(textList[position].x, textList[position].y, (4 * 36), 50), 2)
         pygame.display.update()
