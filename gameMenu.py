@@ -133,7 +133,7 @@ def enterNewGame(pygame, screen, font, timer):
                     if(position > max - 1):
                         position = max - 1
                 elif mode == -1:
-                    return position
+                    return characterTypeList[position].ID
         keys = pygame.key.get_pressed()
         if keys[K_ESCAPE]:
             print('K_ESCAPE')
@@ -147,8 +147,7 @@ def enterNewGame(pygame, screen, font, timer):
         elif keys[K_RIGHT] or keys[K_d]:
             mode = 4
         elif keys[K_KP_ENTER]:
-            print('Enter')
-            return position
+            mode = -1
         else:
             mode = 0
         characterTypeGroup.update(ticks, 50)

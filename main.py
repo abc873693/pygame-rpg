@@ -30,8 +30,6 @@ def calc_velocity(direction, vel=1.0):
     
     return velocity
 
-sqliteHelper.insertGameRecord(1,'XXX')
-
 pygame.init()
 screen = pygame.display.set_mode((800, 600))
 pygame.display.set_caption("RPG")
@@ -40,6 +38,7 @@ timer = pygame.time.Clock()
 
 menu_state = 1
 game_over = False
+ID = 0
 while menu_state != 0:
     #主畫面
     if menu_state == 1:
@@ -51,13 +50,15 @@ while menu_state != 0:
     #新遊戲
     elif menu_state == 2:
         print('新遊戲')
-        position = enterNewGame(pygame,screen,font,timer)
-        if position == -1:
+        ID = enterNewGame(pygame,screen,font,timer)
+        if ID == -1:
             menu_state = 1
         else:
             editBox = TKEditBox('請輸入名字')
             editBox.loop()
             print(editBox.NAME.get())
+            sqliteHelper.insertGameRecord(ID,editBox.NAME.get())
+            menu_state = 0
     #載入遊戲
     elif menu_state == 3:
         print('載入遊戲')
@@ -65,6 +66,8 @@ while menu_state != 0:
         print(ID)
         if ID == -1:
             menu_state = 1
+        else:
+            menu_state = 0
     #排行榜
     elif menu_state == 4:
         print('排行榜')
@@ -79,7 +82,7 @@ while menu_state != 0:
 
 monsters = getAllMonster()
 # 讀取遊戲紀錄
-gameRecord = getGameRecordByID(1)
+gameRecord = getGameRecordByID(ID)
 # 讀取腳色資料
 characterType = getCharacterTypedByID(gameRecord.characterTypeID)
 
