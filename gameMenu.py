@@ -199,7 +199,6 @@ def enterLoadGame(pygame, screen, font, timer):
     textSmallList.append(TextData(700, 550, 'ESC返回', colors.white))
     max = len(gameRecordList)
     while True:
-        print(position)
         timer.tick(30)
         ticks = pygame.time.get_ticks()
 
@@ -221,7 +220,7 @@ def enterLoadGame(pygame, screen, font, timer):
                     if(position > (max-1)*3):
                         position = (max-1)*3
                 elif mode == -1:
-                    return position
+                    return gameRecordList[int(position/3)].ID
         keys = pygame.key.get_pressed()
         if keys[K_ESCAPE]:
             return -1
@@ -230,8 +229,7 @@ def enterLoadGame(pygame, screen, font, timer):
         elif keys[K_DOWN] or keys[K_s]:
             mode = 2
         elif keys[K_KP_ENTER]:
-            print('Enter')
-            return position
+            mode = -1
         else:
             mode = 0
         # 清除畫面
