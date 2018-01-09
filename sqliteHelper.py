@@ -9,7 +9,7 @@ def Connect():
     cursor.execute(
         "CREATE TABLE IF NOT EXISTS `rank` (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, name TEXT, time INTEGER)")
 
-def getAllCharacterType():
+def getAllCharacterType(self):
     Connect()
     cursor.execute("SELECT * FROM `CharacterType`")
     results = []
