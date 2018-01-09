@@ -47,7 +47,7 @@ class CharacterSprite(pygame.sprite.Sprite):
 
     def getAttack(self):
         return (self.characterTypeData.initAttack + self.gameRecord.getlevel() * self.characterTypeData.bonusAttack)
-
+        
     def load(self, filename, width, height, columns):
         self.master_image = pygame.image.load(filename).convert_alpha()
         self.frame_width = width

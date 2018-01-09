@@ -91,6 +91,7 @@ for n in range(1, 2):
 
 # 提示訊息
 hintDataList = []
+infoList = []
 
 player_moving = False
 player_health = 0
@@ -191,12 +192,20 @@ while not game_over:
         # if player_health > 100:
         #     player_health = 100
 
+    
         # 更新食物精靈組
         monster_group.update(ticks, 50)
 
         # if len(monster_group) == 0:
         #     pass
         #     game_over = True
+    
+    # 人物當前資訊
+    attack = player.getAttack()
+    infoList.append(TextData(50, 500, player.characterTypeData.name, colors.white))
+    infoList.append(TextData(30, 550, "LV." + str(player.gameRecord.getlevel()), colors.white))
+    infoList.append(TextData(110, 550, "Attack:" + str(attack), colors.white))
+    
     # 清除畫面
     screen.fill((50, 50, 100))
 
@@ -204,10 +213,14 @@ while not game_over:
     monster_group.draw(screen)
     player_group.draw(screen)
 
+    # 繪製玩家資訊
+    for textData in infoList:
+        print_text(font, textData.x, textData.y,textData.text, colors.white)
+                       
     # 繪製玩家血量條
     pygame.draw.rect(screen, (50, 150, 50, 180),
                      Rect(300, 570, player_health * 2, 25))
-    pygame.draw.rect(screen, (100, 200, 100, 180), Rect(300, 570, 200, 25), 2)
+    pygame.draw.rect(screen, (100, 200, 100, 180), Rect(300, 570, 200, 25), 0)
 
     # 顯示提示
     hintDataListSize =   - 1
