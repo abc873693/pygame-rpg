@@ -23,7 +23,7 @@ class CharacterSprite(pygame.sprite.Sprite):
         self.gameRecord = gameRecord
         self.characterTypeData = characterTypeData
         fileNmae = 'images/character/%s' % (characterTypeData.imageName)
-        self.load(fileNmae, 32, 32, 4)
+        self.load(fileNmae, 32, 32, 3)
         self.position = (gameRecord.currentX, gameRecord.currentY)
         self.direction = gameRecord.currentDirection
 
