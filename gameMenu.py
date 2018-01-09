@@ -183,17 +183,17 @@ def enterLoadGame(pygame, screen, font, timer):
     textList.append(TextData(100, 150, '名稱', colors.white))
     textList.append(TextData(300, 150, '角色', colors.white))
     textList.append(TextData(550, 150, '等級', colors.white))
-    
+
     i = 0
     for gameRecord in gameRecordList:
         offsetY = 50 * i
         i = i + 1
         textSmallList.append(TextData(100, startY + offsetY,
-                                  gameRecord.characterName, colors.white))
+                                      gameRecord.characterName, colors.white))
         textSmallList.append(TextData(300, startY + offsetY,
-                                  gameRecord.getChracterType().name, colors.white))
+                                      gameRecord.getChracterType().name, colors.white))
         textSmallList.append(TextData(550, startY + offsetY,
-                                  str(gameRecord.experience), colors.white))
+                                      'LV.' + str(gameRecord.getlevel()), colors.white))
     textSmallList.append(TextData(700, 550, 'ESC返回', colors.white))
     max = len(gameRecordList)
     while True:
@@ -215,10 +215,10 @@ def enterLoadGame(pygame, screen, font, timer):
                         position = 0
                 elif mode == 2:
                     position = position + 3
-                    if(position > (max-1)*3):
-                        position = (max-1)*3
+                    if(position > (max - 1) * 3):
+                        position = (max - 1) * 3
                 elif mode == -1:
-                    return gameRecordList[int(position/3)].ID
+                    return gameRecordList[int(position / 3)].ID
         keys = pygame.key.get_pressed()
         if keys[K_ESCAPE]:
             return -1
@@ -252,7 +252,7 @@ def enterLoadRank(pygame, screen, font, timer):
     mode = 0
     position = 0
     key_pressing = False
-    gameRecordList = getAllGameRecord()
+    gameRecordList = getRankGameRecord()
     startX = 200
     startY = 200
     textList = []
@@ -271,7 +271,7 @@ def enterLoadRank(pygame, screen, font, timer):
         textSmallList.append(TextData(
             300, startY + offsetY, gameRecord.getChracterType().name, colors.white))
         textSmallList.append(
-            TextData(550, startY + offsetY, str(gameRecord.experience), colors.white))
+            TextData(550, startY + offsetY, 'LV.' + str(gameRecord.getlevel()), colors.white))
 
     max = len(gameRecordList)
     while True:

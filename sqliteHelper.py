@@ -50,6 +50,19 @@ def getAllGameRecord():
     return results
 
 
+def getRankGameRecord():
+    Connect()
+    cursor.execute("SELECT * FROM `GameRecord` ORDER BY `Experience` DESC")
+    results = []
+    fetch = cursor.fetchall()
+    for data in fetch:
+        results.append(GameRecordData(
+            data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7], data[8]))
+    cursor.close()
+    conn.close()
+    return results
+
+
 def getGameRecordByID(ID):
     Connect()
     sql = "SELECT * FROM `GameRecord` WHERE ID  = %d" % (ID) 
@@ -73,7 +86,7 @@ def insertGameRecord(characterTypeID, characterName):
     conn.commit()
     cursor.close()
     conn.close()
-
+    return cursor.lastrowid
 
 def getMonsterRecordByGameRecordID(gameRecordID):
     Connect()

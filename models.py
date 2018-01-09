@@ -45,6 +45,9 @@ class CharacterSprite(pygame.sprite.Sprite):
     def _setpos(self, pos): self.rect.topleft = pos
     position = property(_getpos, _setpos)
 
+    def getAttack(self):
+        return (self.characterTypeData.initAttack + self.gameRecord.getlevel() * self.characterTypeData.bonusAttack)
+
     def load(self, filename, width, height, columns):
         self.master_image = pygame.image.load(filename).convert_alpha()
         self.frame_width = width
@@ -65,10 +68,8 @@ class CharacterSprite(pygame.sprite.Sprite):
 
         # build current frame only if it changed
         if self.frame != self.old_frame:
-            print(self.characterTypeData.imageName)
             frame_x = (self.frame % self.columns) * self.frame_width
             frame_y = (self.frame // self.columns) * self.frame_height
-            print(("%d %d %d %d" % (frame_x, frame_y, self.frame_width, self.frame_height)))
             rect = Rect(frame_x, frame_y, self.frame_width, self.frame_height)
             self.image = self.master_image.subsurface(rect)
             self.old_frame = self.frame
@@ -82,7 +83,7 @@ class CharacterSprite(pygame.sprite.Sprite):
 
 class MonsterSprite(pygame.sprite.Sprite):
 
-    def __init__(self,monsterData):
+    def __init__(self, monsterData):
         pygame.sprite.Sprite.__init__(self)  # extend the base Sprite class
         self.master_image = None
         self.frame = 0
@@ -96,13 +97,12 @@ class MonsterSprite(pygame.sprite.Sprite):
         self.direction = 0
         self.velocity = Point(0.0, 0.0)
         self.monsterData = monsterData
-        fileNmae = 'images/monster/%s'  % (monsterData.imageName)
+        self.currentHP = monsterData.HP
+        fileNmae = 'images/monster/%s' % (monsterData.imageName)
         self.load(fileNmae, 32, 32, 3)
         self.position = (monsterData.imageStartX, monsterData.imageStartY)
-        self.direction = 1 #direction
+        self.direction = 1  # direction
         self.move()
-        
-        
 
     # X property
     def _getx(self): return self.rect.x
@@ -134,7 +134,7 @@ class MonsterSprite(pygame.sprite.Sprite):
 
     def update(self, current_time, rate=30):
         # update animation frame number
-        self.move()
+        # self.move()
         if current_time > self.last_time + rate:
             self.frame += 1
             if self.frame > self.last_frame:
@@ -150,15 +150,15 @@ class MonsterSprite(pygame.sprite.Sprite):
             self.old_frame = self.frame
 
     def move(self):
-        randint = random.randrange(0,100)
-        monster_direction = randint % 4     
-        if monster_direction == 0 :
+        randint = random.randrange(0, 100)
+        monster_direction = randint % 4
+        if monster_direction == 0:
             food_moving = True
-        elif monster_direction == 1 :
+        elif monster_direction == 1:
             food_moving = True
-        elif monster_direction == 2 :
+        elif monster_direction == 2:
             food_moving = True
-        elif monster_direction == 3 :
+        elif monster_direction == 3:
             food_moving = True
 
         # 根據角色的不同方向，使用不同的動畫幀
@@ -167,12 +167,10 @@ class MonsterSprite(pygame.sprite.Sprite):
         if self.frame < self.first_frame:
             self.frame = self.first_frame
 
-       
         self.velocity = calc_velocity(monster_direction, 3)
         self.velocity.x *= 3
         self.velocity.y *= 3
 
-        
         self.X += self.velocity.x
         self.Y += self.velocity.y
         if self.X < -10:
@@ -183,7 +181,6 @@ class MonsterSprite(pygame.sprite.Sprite):
             self.Y = -10
         elif self.Y > 580:
             self.Y = 580
-
 
     def __str__(self):
         return str(self.frame) + "," + str(self.first_frame) + \
@@ -240,14 +237,31 @@ class GameRecordData():
         self.currentX = CurrentX
         self.currentY = CurrentY
         self.currentDirection = CurrentDirection
+
     def getChracterType(self):
-         return sqliteHelper.getCharacterTypedByID(self.characterTypeID)
+        return sqliteHelper.getCharacterTypedByID(self.characterTypeID)
+
+    def getlevel(self):
+        sum = 0
+        fac = [0, 1]
+        level = 0
+        level += 1
+        sum += 1
+        while self.experience >= sum:
+            level += 1
+            max = len(fac)
+            fac.append(fac[max - 1] + fac[max - 2])
+            sum += fac[max]
+        return level
+
+
 class GameData():
-    #為了選角用
+    # 為了選角用
     def __init__(self, CurrentX, CurrentY, CurrentDirection):
         self.currentX = CurrentX
         self.currentY = CurrentY
         self.currentDirection = CurrentDirection
+
 
 class MonsterData():
 
@@ -271,28 +285,43 @@ class MonsterRecordData():
         self.currentX = CurrentX
         self.currentY = CurrentY
 
+
 class TextData():
     def __init__(self, x, y, text, color):
         self.x = x
         self.y = y
         self.text = text
         self.color = color
-    
-    def getTextSize():
+
+    def getTextSize(self):
         return len(self.text)
+
+class HintData():
+    def __init__(self, text):
+        self.text = text
+        self.color = color
+        self.time = 0
+
+    def setText(self, text,time):
+        self.text = text
+        self.time = time
+
+    def getTextSize(self):
+        return len(self.text)
+
 
 def calc_velocity(direction, vel=1.0):
     velocity = Point(0, 0)  # 速度
-    if direction == 0:  #下
+    if direction == 0:  # 下
         velocity.y = vel
 
     elif direction == 1:  # 左
         velocity.x = -vel
-    
+
     elif direction == 2:  # 右
         velocity.x = vel
-    
+
     elif direction == 3:  # 上
         velocity.y = -vel
-    
+
     return velocity
