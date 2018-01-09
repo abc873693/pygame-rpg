@@ -2,7 +2,6 @@ import pygame
 import random
 import sqliteHelper
 from pygame.locals import *
-#from sqliteHelper import *
 
 
 # CharacterSprite class extends pygame.sprite.Sprite
@@ -241,8 +240,8 @@ class GameRecordData():
         self.currentX = CurrentX
         self.currentY = CurrentY
         self.currentDirection = CurrentDirection
-    # def getChracterType():
-    #     return getCharacterTypedByID(self.characterTypeID)
+    def getChracterType(self):
+         return sqliteHelper.getCharacterTypedByID(self.characterTypeID)
 class GameData():
     #為了選角用
     def __init__(self, CurrentX, CurrentY, CurrentDirection):

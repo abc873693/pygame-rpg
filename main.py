@@ -61,8 +61,9 @@ while menu_state != 0:
     #載入遊戲
     elif menu_state == 3:
         print('載入遊戲')
-        position = enterLoadGame(pygame,screen,font,timer)
-        if position == -1:
+        ID = enterLoadGame(pygame,screen,font,timer)
+        print(ID)
+        if ID == -1:
             menu_state = 1
     #排行榜
     elif menu_state == 4:
