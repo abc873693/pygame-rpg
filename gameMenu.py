@@ -22,7 +22,6 @@ def enterMenu(pygame, screen, font, timer):
     max = len(textList)
 
     while True:
-        print(position)
         timer.tick(30)
         ticks = pygame.time.get_ticks()
 

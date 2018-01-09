@@ -11,6 +11,7 @@ from utils import *
 from models import *
 from sqliteHelper import *
 from gameMenu import *
+from TkinterHelper import *
 
 
 def calc_velocity(direction, vel=1.0):
@@ -29,6 +30,7 @@ def calc_velocity(direction, vel=1.0):
     
     return velocity
 
+sqliteHelper.insertGameRecord(1,'XXX')
 
 pygame.init()
 screen = pygame.display.set_mode((800, 600))
@@ -38,14 +40,13 @@ timer = pygame.time.Clock()
 
 menu_state = 1
 game_over = False
-
 while menu_state != 0:
     #主畫面
     if menu_state == 1:
         print('主畫面')
         position = enterMenu(pygame,screen,font,timer)
         print('position',position)
-        menu_state = 0
+        menu_state = position + 2
         print('menu_state',menu_state)
     #新遊戲
     elif menu_state == 2:
@@ -53,6 +54,10 @@ while menu_state != 0:
         position = enterNewGame(pygame,screen,font,timer)
         if position == -1:
             menu_state = 1
+        else:
+            editBox = TKEditBox('請輸入名字')
+            editBox.loop()
+            print(editBox.NAME.get())
     #載入遊戲
     elif menu_state == 3:
         print('載入遊戲')
