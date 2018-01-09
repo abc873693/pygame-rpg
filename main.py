@@ -45,7 +45,7 @@ while menu_state != 0:
         print('主畫面')
         position = enterMenu(pygame,screen,font,timer)
         print('position',position)
-        menu_state = 0
+        menu_state = position + 2
         print('menu_state',menu_state)
     #新遊戲
     elif menu_state == 2:
