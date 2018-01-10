@@ -11,6 +11,7 @@ def Connect():
     cursor.execute(
         "CREATE TABLE IF NOT EXISTS `rank` (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, name TEXT, time INTEGER)")
 
+
 def getAllCharacterType(self):
     Connect()
     cursor.execute("SELECT * FROM `CharacterType`")
@@ -26,7 +27,7 @@ def getAllCharacterType(self):
 
 def getCharacterTypedByID(ID):
     Connect()
-    sql = "SELECT * FROM `CharacterType` WHERE ID  = %d" % (ID) 
+    sql = "SELECT * FROM `CharacterType` WHERE ID  = %d" % (ID)
     cursor.execute(sql)
     fetch = cursor.fetchall()
     for data in fetch:
@@ -65,7 +66,7 @@ def getRankGameRecord():
 
 def getGameRecordByID(ID):
     Connect()
-    sql = "SELECT * FROM `GameRecord` WHERE ID = %d" % (ID) 
+    sql = "SELECT * FROM `GameRecord` WHERE ID = %d" % (ID)
     cursor.execute(sql)
     fetch = cursor.fetchall()
     for data in fetch:
@@ -81,24 +82,25 @@ def insertGameRecord(characterTypeID, characterName):
     cursor = conn.cursor()
     characterType = getCharacterTypedByID(characterTypeID)
     sql = "INSERT INTO `GameRecord` (CharacterTypeID ,CharacterName ,CurrentHP ,Experience ,CurrentMapID ,CurrentX ,CurrentY ,CurrentDirection) VALUES(%d, '%s', %d, %d, %d, %d, %d, %d)" % (
-        characterTypeID, characterName, characterType.initHP + characterType.bonusHP , 0, 0, 100, 100, 0)
+        characterTypeID, characterName, characterType.initHP + characterType.bonusHP, 0, 0, 100, 100, 0)
     cursor.execute(sql)
     conn.commit()
     cursor.close()
     conn.close()
     return cursor.lastrowid
 
+
 def updateGameRecord(gameRecordID, player):
     conn = sqlite3.connect('pythontut.db')
     cursor = conn.cursor()
-    characterType = getCharacterTypedByID(characterTypeID)
     sql = "UPDATE `GameRecord` SET CurrentHP = %d ,Experience = %d ,CurrentX = %d ,CurrentY = %d ,CurrentDirection = %d WHERE ID = %d" % (
-        player.gameRecordData.currentHP, player.getCurrentHP() , player.X , player.Y , player.direction, gameRecordID)
+        player.getCurrentHP(), player.getCurrentEXP(), player.X, player.Y, player.direction, gameRecordID)
     cursor.execute(sql)
     conn.commit()
     cursor.close()
     conn.close()
     return cursor.lastrowid
+
 
 def getMonsterRecordByGameRecordID(gameRecordID):
     Connect()
@@ -108,11 +110,12 @@ def getMonsterRecordByGameRecordID(gameRecordID):
     results = []
     fetch = cursor.fetchall()
     for data in fetch:
-        results.append(GameRecordData(
-            data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7]))
+        results.append(MonsterRecordData(
+            data[0], data[1], data[2], data[3], data[4], data[5]))
     cursor.close()
     conn.close()
     return results
+
 
 def deleteMonsterRecordByGameRecordID(gameRecordID):
     Connect()
@@ -122,6 +125,7 @@ def deleteMonsterRecordByGameRecordID(gameRecordID):
     conn.commit()
     cursor.close()
     conn.close()
+
 
 def insertMonsterRecord(gameRecordID, monstergroup):
     conn = sqlite3.connect('pythontut.db')
@@ -135,6 +139,7 @@ def insertMonsterRecord(gameRecordID, monstergroup):
     conn.close()
     return cursor.lastrowid
 
+
 def getAllMonster():
     Connect()
     cursor.execute("SELECT * FROM `Monster`")
@@ -142,24 +147,20 @@ def getAllMonster():
     fetch = cursor.fetchall()
     for data in fetch:
         results.append(MonsterData(
-            data[0], data[1], data[2], data[3], data[4], data[5], data[6]))
-    cursor.close()
-    conn.close()
-    return resultspend(GameRecordData(
             data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7]))
     cursor.close()
     conn.close()
     return results
 
 
-def getAllMonster():
+def getMonsterByID(ID):
     Connect()
-    cursor.execute("SELECT * FROM `Monster`")
-    results = []
+    sql = "SELECT * FROM `Monster` WHERE ID  = %d" % (ID)
+    cursor.execute(sql)
     fetch = cursor.fetchall()
     for data in fetch:
-        results.append(MonsterData(
-            data[0], data[1], data[2], data[3], data[4], data[5], data[6]))
+        result = MonsterData(
+            data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7])
     cursor.close()
     conn.close()
-    return results
+    return result

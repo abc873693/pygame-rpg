@@ -47,16 +47,28 @@ class CharacterSprite(pygame.sprite.Sprite):
     position = property(_getpos, _setpos)
 
     def getAttack(self):
-        return (self.characterTypeData.initAttack + self.gameRecord.getlevel() * self.characterTypeData.bonusAttack)
-        
+        return (self.characterTypeData.initAttack + self.gameRecord.getLevel() * self.characterTypeData.bonusAttack)
+
     def getMaxHP(self):
-        return (self.characterTypeData.initHP + self.gameRecord.getlevel() * self.characterTypeData.bonusHP)
+        return (self.characterTypeData.initHP + self.gameRecord.getLevel() * self.characterTypeData.bonusHP)
 
     def getCurrentHP(self):
         return self.gameRecord.currentHP
 
-    def setCurrentHP(self,HP):
+    def setCurrentHP(self, HP):
         self.gameRecord.currentHP = HP
+
+    def getCurrentEXP(self):
+        return self.gameRecord.experience
+
+    def setCurrentEXP(self, EXP):
+        self.gameRecord.experience = EXP
+
+    def addEXP(self, EXP):
+        self.gameRecord.experience += EXP
+
+    def getLevel(self):
+        return self.gameRecord.getLevel()
 
     def load(self, filename, width, height, columns):
         self.master_image = pygame.image.load(filename).convert_alpha()
@@ -93,7 +105,7 @@ class CharacterSprite(pygame.sprite.Sprite):
 
 class MonsterSprite(pygame.sprite.Sprite):
 
-    def __init__(self, monsterData):
+    def __init__(self, monsterData, monsterRecordData):
         pygame.sprite.Sprite.__init__(self)  # extend the base Sprite class
         self.master_image = None
         self.frame = 0
@@ -107,12 +119,18 @@ class MonsterSprite(pygame.sprite.Sprite):
         self.direction = 0
         self.velocity = Point(0.0, 0.0)
         self.monsterData = monsterData
-        self.currentHP = monsterData.HP
+        self.currentHP = 0
         fileNmae = 'images/monster/%s' % (monsterData.imageName)
         self.load(fileNmae, 32, 32, 3)
-        self.position = (monsterData.imageStartX, monsterData.imageStartY)
+        self.position = (0, 0)
+        if monsterRecordData == None:
+            self.currentHP = monsterData.HP
+            self.position = (random.randint(0, 420), random.randint(0, 550))
+        else:
+            self.currentHP = monsterRecordData.currentHP
+            self.position = (monsterRecordData.currentX,
+                             monsterRecordData.currentY)
         self.direction = 1  # direction
-        self.move()
 
     # X property
     def _getx(self): return self.rect.x
@@ -131,6 +149,9 @@ class MonsterSprite(pygame.sprite.Sprite):
 
     def _setpos(self, pos): self.rect.topleft = pos
     position = property(_getpos, _setpos)
+
+    def getEXP(self, level):
+        return self.monsterData.experience
 
     def load(self, filename, width, height, columns):
         self.master_image = pygame.image.load(filename).convert_alpha()
@@ -153,8 +174,10 @@ class MonsterSprite(pygame.sprite.Sprite):
 
         # build current frame only if it changed
         if self.frame != self.old_frame:
-            frame_x = (self.frame % self.columns) * self.frame_width
-            frame_y = (self.frame // self.columns) * self.frame_height
+            frame_x = (self.frame % self.columns) * \
+                self.frame_width + self.monsterData.imageStartX
+            frame_y = (self.frame // self.columns) * \
+                self.frame_height + self.monsterData.imageStartY
             rect = Rect(frame_x, frame_y, self.frame_width, self.frame_height)
             self.image = self.master_image.subsurface(rect)
             self.old_frame = self.frame
@@ -251,7 +274,7 @@ class GameRecordData():
     def getChracterType(self):
         return sqliteHelper.getCharacterTypedByID(self.characterTypeID)
 
-    def getlevel(self):
+    def getLevel(self):
         sum = 0
         fac = [0, 1]
         level = 0
@@ -275,7 +298,7 @@ class GameData():
 
 class MonsterData():
 
-    def __init__(self, ID, Name, ImageName, HP, Attack, ImageStartX, ImageStartY):
+    def __init__(self, ID, Name, ImageName, HP, Attack, ImageStartX, ImageStartY,Experience):
         self.ID = ID
         self.name = Name
         self.imageName = ImageName
@@ -283,6 +306,7 @@ class MonsterData():
         self.attack = Attack
         self.imageStartX = ImageStartX
         self.imageStartY = ImageStartY
+        self.experience = Experience
 
 
 class MonsterRecordData():
@@ -290,7 +314,7 @@ class MonsterRecordData():
     def __init__(self, ID, GameRecordID, MosterID, CurrentHP, CurrentX, CurrentY):
         self.ID = ID
         self.gameRecordID = GameRecordID
-        self.imageName = MosterID
+        self.mosterID = MosterID
         self.currentHP = CurrentHP
         self.currentX = CurrentX
         self.currentY = CurrentY
@@ -306,13 +330,14 @@ class TextData():
     def getTextSize(self):
         return len(self.text)
 
+
 class HintData():
     def __init__(self, text):
         self.text = text
         self.color = color
         self.time = 0
 
-    def setText(self, text,time):
+    def setText(self, text, time):
         self.text = text
         self.time = time
 

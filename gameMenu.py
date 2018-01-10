@@ -15,6 +15,7 @@ def enterMenu(pygame, screen, font, timer):
     position = 0
     key_pressing = False
     textList = []
+    font_large = pygame.font.Font("fonts/msjh.ttf", 42)
     textList.append(TextData(300, 300, '新遊戲', colors.white))
     textList.append(TextData(300, 350, '載入遊戲', colors.white))
     textList.append(TextData(300, 400, '排行榜', colors.white))
@@ -61,9 +62,11 @@ def enterMenu(pygame, screen, font, timer):
         for textData in textList:
             print_text(font, textData.x, textData.y,
                        textData.text, colors.white)
+        print_text(font_large, 250, 100,
+                   'RPG 打怪練功', colors.white)
         # print(textList[position].getTextSize())
         pygame.draw.rect(screen, (100, 200, 100, 180),
-                         Rect(textList[position].x, textList[position].y, (4 * 36), 50), 2)
+                         Rect(textList[position].x - 5, textList[position].y - 2, (textList[position].getTextSize() * 40), 55), 2)
         pygame.display.update()
 
 # 新遊戲
@@ -193,7 +196,7 @@ def enterLoadGame(pygame, screen, font, timer):
         textSmallList.append(TextData(300, startY + offsetY,
                                       gameRecord.getChracterType().name, colors.white))
         textSmallList.append(TextData(550, startY + offsetY,
-                                      'LV.' + str(gameRecord.getlevel()), colors.white))
+                                      'LV.' + str(gameRecord.getLevel()), colors.white))
     textSmallList.append(TextData(700, 550, 'ESC返回', colors.white))
     max = len(gameRecordList)
     while True:
@@ -271,7 +274,7 @@ def enterLoadRank(pygame, screen, font, timer):
         textSmallList.append(TextData(
             300, startY + offsetY, gameRecord.getChracterType().name, colors.white))
         textSmallList.append(
-            TextData(550, startY + offsetY, 'LV.' + str(gameRecord.getlevel()), colors.white))
+            TextData(550, startY + offsetY, 'LV.' + str(gameRecord.getLevel()), colors.white))
 
     max = len(gameRecordList)
     while True:
