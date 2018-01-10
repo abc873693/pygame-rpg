@@ -15,6 +15,7 @@ from TkinterHelper import *
 
 
 pygame.init()
+pygame.mixer.init()  # 撥放音樂運行之前需要初始化
 screen = pygame.display.set_mode((800, 600))
 pygame.display.set_caption("RPG")
 font = pygame.font.Font("fonts/msjh.ttf", 36)
@@ -130,6 +131,7 @@ while not game_over:
             print('attack')
             key_space_pressing = True
             isAttack = True
+            playMusic(pygame, 'music/swing.mp3')
     if keys[K_TAB]:
         if not key_tab_pressing:
             key_tab_pressing = True
@@ -210,7 +212,8 @@ while not game_over:
                         # 重新生成怪物
                         for n in range(1, 10):
                             index = random.randint(0, len(monsters) - 1)
-                            monsterSprite = MonsterSprite(monsters[index], None)
+                            monsterSprite = MonsterSprite(
+                                monsters[index], None)
                             monsterGroup.add(monsterSprite)
 
         if player.hurtCD > 0:

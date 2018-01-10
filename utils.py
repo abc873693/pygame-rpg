@@ -62,3 +62,9 @@ def monsterCanAttack(player, monsterSpriteList):
             if((x <= monsterSprite.X & monsterSprite.X <= x + range) & (y <= monsterSprite.Y & monsterSprite.Y <= y + range)):
                 return monsterSprite
     return None
+
+def playMusic(pygame,fileNamePath):
+    pygame.mixer.music.load(fileNamePath)
+    pygame.mixer.music.play()
+    time.sleep(0.1)
+    pygame.mixer.music.stop()
