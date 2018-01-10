@@ -18,7 +18,7 @@ pygame.init()
 screen = pygame.display.set_mode((800, 600))
 pygame.display.set_caption("RPG")
 font = pygame.font.Font("fonts/msjh.ttf", 36)
-font_small = pygame.font.Font("fonts/msjh.ttf", 18)
+font_small = pygame.font.Font("fonts/msjh.ttf", 14)
 timer = pygame.time.Clock()
 
 menu_state = 1
@@ -84,14 +84,13 @@ player = CharacterSprite(gameRecord, characterType)
 player_group.add(player)
 
 # 初始化food精靈組
-for n in range(1, 2):
+for n in range(1,20):
     food = MonsterSprite(monsters[1])
     # food.position = random.randint(0, 780), random.randint(0, 580)
     monster_group.add(food)
 
 # 提示訊息
 hintDataList = []
-
 player_moving = False
 player_health = 0
 time = 0
@@ -171,18 +170,22 @@ while not game_over:
                 player.Y = 580
 
         # 檢測玩家是否與食物衝突，是否吃到果實
+        
         attacker = None
         attacker = pygame.sprite.spritecollideany(player, monster_group)
         nearMonster = monsterCanAttack(player, monster_group.sprites())
         if isAttack:
+            
             if nearMonster != None:
                 print(player.getAttack())
                 attack = player.getAttack()
                 nearMonster.currentHP -= attack
                 hintDataList.append(HintData('勇者對怪物造成傷害'+str(attack)))
+                
                 if nearMonster.currentHP <= 0:
                     monster_group.remove(attacker)
                     hintDataList.append(HintData(nearMonster.monsterData.name + '怪物死亡'))
+            
         # print(nearMonster)
         # if attacker != None:
         #     if pygame.sprite.collide_circle_ratio(0.65)(player, attacker):
@@ -208,11 +211,22 @@ while not game_over:
     pygame.draw.rect(screen, (50, 150, 50, 180),
                      Rect(300, 570, player_health * 2, 25))
     pygame.draw.rect(screen, (100, 200, 100, 180), Rect(300, 570, 200, 25), 2)
-
+    print('hintDataList' + str( len(hintDataList)))
+    
     # 顯示提示
-    hintDataListSize =   - 1
-    for i in range(0,len(hintDataList)):
-        print_text(font_small, 400, (i+1) * 100, hintDataList[i].text)
+    end = 0
+    hintcount = 0
+    if len(hintDataList) <= 10:
+        end = 0
+    else:
+        end = len(hintDataList) - 10
+
+    for i in range(end,len(hintDataList)):
+        print_text(font_small, 620, 390+(hintcount+1) * 18, hintDataList[i].text)
+        hintcount+=1
+        if hintcount == 10:
+            hintcount = 0
+       
     if game_over:
         print('game over')
 

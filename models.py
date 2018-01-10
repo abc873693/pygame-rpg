@@ -134,7 +134,7 @@ class MonsterSprite(pygame.sprite.Sprite):
 
     def update(self, current_time, rate=30):
         # update animation frame number
-        # self.move()
+        self.move()
         if current_time > self.last_time + rate:
             self.frame += 1
             if self.frame > self.last_frame:
@@ -168,8 +168,8 @@ class MonsterSprite(pygame.sprite.Sprite):
             self.frame = self.first_frame
 
         self.velocity = calc_velocity(monster_direction, 3)
-        self.velocity.x *= 3
-        self.velocity.y *= 3
+        self.velocity.x *= 1
+        self.velocity.y *= 1
 
         self.X += self.velocity.x
         self.Y += self.velocity.y
