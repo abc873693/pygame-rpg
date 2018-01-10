@@ -21,6 +21,7 @@ font = pygame.font.Font("fonts/msjh.ttf", 36)
 font_small = pygame.font.Font("fonts/msjh.ttf", 14)
 timer = pygame.time.Clock()
 
+
 menu_state = 1
 game_over = False
 ID = 0
@@ -111,13 +112,15 @@ while not game_over:
     keys = pygame.key.get_pressed()
 
     if keys[K_SPACE]:
+
         if not key_space_pressing:
             print('attack')
             key_space_pressing = True
             isAttack = True
 
     if keys[K_ESCAPE]:
-        sys.exit()
+        game_over = True
+        # sys.exit()
 
     elif keys[K_DOWN] or keys[K_s]:
         player.direction = 0
@@ -228,6 +231,11 @@ while not game_over:
             hintcount = 0
        
     if game_over:
-        print('game over')
-
+        print_text(font,290,250,"Game Over!!!")
+        
+        
+        
+            
     pygame.display.update()
+
+pygame.time.delay(1500)
