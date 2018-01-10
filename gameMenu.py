@@ -93,9 +93,9 @@ def enterNewGame(pygame, screen, font, timer):
         textSmallList.append(TextData(startX + offsetX, startY +
                                       50, characterType.name, colors.white))
         textSmallList.append(TextData(startX + offsetX, startY + 80,
-                                      'HP:' + str(characterType.initHP), colors.white))
+                                      'HP:' + str(characterType.initHP + characterType.bonusHP), colors.white))
         textSmallList.append(TextData(startX + offsetX, startY + 110,
-                                      'Attack:' + str(characterType.initAttack), colors.white))
+                                      'Attack:' + str(characterType.initAttack + characterType.bonusAttack), colors.white))
         i = i + 1
         if i == 3:
             startY = startY + 250

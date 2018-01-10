@@ -81,7 +81,7 @@ def insertGameRecord(characterTypeID, characterName):
     cursor = conn.cursor()
     characterType = getCharacterTypedByID(characterTypeID)
     sql = "INSERT INTO `GameRecord` (CharacterTypeID ,CharacterName ,CurrentHP ,Experience ,CurrentMapID ,CurrentX ,CurrentY ,CurrentDirection) VALUES(%d, '%s', %d, %d, %d, %d, %d, %d)" % (
-        characterTypeID, characterName, characterType.initHP, 0, 0, 100, 100, 0)
+        characterTypeID, characterName, characterType.initHP + characterType.bonusHP , 0, 0, 100, 100, 0)
     cursor.execute(sql)
     conn.commit()
     cursor.close()

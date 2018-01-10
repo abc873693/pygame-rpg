@@ -92,8 +92,13 @@ for n in range(1,20):
 deleteMonsterRecordByGameRecordID(gameRecord.ID)
 # 提示訊息
 hintDataList = []
+infoList = []
+hpList = []
+
 player_moving = False
-player_health = 0
+player_HP = 0
+player_currentHP = 0
+hp_count = 0
 time = 0
 key_space_pressing = False
 while not game_over:
@@ -175,33 +180,52 @@ while not game_over:
         # 檢測玩家是否與食物衝突，是否吃到果實
         
         attacker = None
-        attacker = pygame.sprite.spritecollideany(player, monster_group)
-        nearMonster = monsterCanAttack(player, monster_group.sprites())
+        attacker = monsterCanAttack(player, monster_group.sprites())
         if isAttack:
-            
             if nearMonster != None:
                 print(player.getAttack())
                 attack = player.getAttack()
                 nearMonster.currentHP -= attack
-                hintDataList.append(HintData('勇者對怪物造成傷害' + str(attack)))
+                hintDataList.append(HintData( player.gameRecord.characterName + '對怪物造成傷害' + str(attack)))
                 if nearMonster.currentHP <= 0:
                     monster_group.remove(attacker)
                     hintDataList.append(
-                        HintData(nearMonster.monsterData.name + '怪物死亡'))
+                        HintData(nearMonster.monsterData.name + '死亡'))
+        if player.hurtCD > 0:
+            player.hurtCD -=1
+        player_HP = player.getMaxHP()
+        player_currentHP = player.getCurrentHP()
+        nearMonster = pygame.sprite.spritecollideany(player, monster_group)
         # print(nearMonster)
-        # if attacker != None:
-        #     if pygame.sprite.collide_circle_ratio(0.65)(player, attacker):
-        #         player_health += 50
-        #         #monster_group.remove(attacker)
-        # if player_health > 100:
-        #     player_health = 100
-
-        # 更新食物精靈組
+        print('CD' + str(player.hurtCD))
+        if nearMonster != None:
+            if pygame.sprite.collide_circle_ratio(0.65)(player, nearMonster):
+                if player.hurtCD == 0:
+                    player_currentHP -= int(nearMonster.monsterData.attack)
+                    player.hurtCD = 50
+                    hintDataList.append(HintData( nearMonster.monsterData.name + "對" + player.gameRecord.characterName + "造成傷害" + nearMonster.monsterData.attack ))         
+        if player_currentHP != player_HP:
+            hp_count = player_currentHP / player_HP
+            hpList.append(TextData(350, 570, str(player_HP) + " / " + str(player_currentHP), colors.white))
+        else:
+            hp_count = 1
+            hpList.append(TextData(350, 570, str(player_HP) + " / " + str(player_currentHP), colors.white))
+        player.setCurrentHP(player_currentHP)
+        # 更新精靈組
         monster_group.update(ticks, 50)
 
         # if len(monster_group) == 0:
         #     pass
         #     game_over = True
+
+    # 人物當前資訊
+    attack=player.getAttack()
+    infoList.append(
+        TextData(50, 500, player.characterTypeData.name, colors.white))
+    infoList.append(
+        TextData(30, 550, "LV." + str(player.gameRecord.getlevel()), colors.white))
+    infoList.append(TextData(110, 550, "Attack:" + str(attack), colors.white))
+
     # 清除畫面
     screen.fill((50, 50, 100))
 
@@ -209,9 +233,11 @@ while not game_over:
     monster_group.draw(screen)
     player_group.draw(screen)
 
+    # 繪製玩家資訊
+    for textData in infoList:
+        print_text(font, textData.x, textData.y, textData.text, colors.white)
+
     # 繪製玩家血量條
-    pygame.draw.rect(screen, (50, 150, 50, 180),
-                     Rect(300, 570, player_health * 2, 25))
     pygame.draw.rect(screen, (100, 200, 100, 180), Rect(300, 570, 200, 25), 2)
     print('hintDataList' + str( len(hintDataList)))
     
@@ -222,19 +248,21 @@ while not game_over:
         end = 0
     else:
         end = len(hintDataList) - 10
-
     for i in range(end,len(hintDataList)):
-        print_text(font_small, 620, 390+(hintcount+1) * 18, hintDataList[i].text)
+        print_text(font_small, 560, 390+(hintcount+1) * 18, hintDataList[i].text)
         hintcount+=1
         if hintcount == 10:
             hintcount = 0
        
+    if player_currentHP == player_HP :
+        pygame.draw.rect(screen, (100, 200, 100, 180), Rect(300, 570, 200, 25), 0)
+    else:
+        pygame.draw.rect(screen, (50, 150, 50, 180),
+                        Rect(300, 570, 200 * hp_count, 25), 0)
+    print_text(font_small,350, 570, str(player.getMaxHP()) + " / " + str(player.getCurrentHP()),colors.white)
+
     if game_over:
         print_text(font,290,250,"Game Over!!!")
-        
-        
-        
-            
     pygame.display.update()
 
 pygame.time.delay(1500)
