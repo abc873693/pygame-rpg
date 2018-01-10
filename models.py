@@ -25,7 +25,7 @@ class CharacterSprite(pygame.sprite.Sprite):
         fileNmae = 'images/character/%s' % (characterTypeData.imageName)
         self.load(fileNmae, 32, 32, 3)
         self.position = (gameRecord.currentX, gameRecord.currentY)
-        #self.direction = gameRecord.currentDirection
+        self.direction = gameRecord.currentDirection
 
     # X property
     def _getx(self): return self.rect.x

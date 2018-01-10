@@ -65,7 +65,7 @@ def getRankGameRecord():
 
 def getGameRecordByID(ID):
     Connect()
-    sql = "SELECT * FROM `GameRecord` WHERE ID  = %d" % (ID) 
+    sql = "SELECT * FROM `GameRecord` WHERE ID = %d" % (ID) 
     cursor.execute(sql)
     fetch = cursor.fetchall()
     for data in fetch:
@@ -88,9 +88,21 @@ def insertGameRecord(characterTypeID, characterName):
     conn.close()
     return cursor.lastrowid
 
+def updateGameRecord(gameRecordID, player):
+    conn = sqlite3.connect('pythontut.db')
+    cursor = conn.cursor()
+    characterType = getCharacterTypedByID(characterTypeID)
+    sql = "UPDATE `GameRecord` SET CurrentHP = %d ,Experience = %d ,CurrentX = %d ,CurrentY = %d ,CurrentDirection = %d WHERE ID = %d" % (
+        player.gameRecordData.currentHP, player.getCurrentHP() , player.X , player.Y , player.direction, gameRecordID)
+    cursor.execute(sql)
+    conn.commit()
+    cursor.close()
+    conn.close()
+    return cursor.lastrowid
+
 def getMonsterRecordByGameRecordID(gameRecordID):
     Connect()
-    sql = "SELECT * FROM `GameRecord` WHERE GameRecordID  = %d" % (
+    sql = "SELECT * FROM `MonsterRecord` WHERE GameRecordID  = %d" % (
         gameRecordID)
     cursor.execute(sql)
     results = []
@@ -102,6 +114,26 @@ def getMonsterRecordByGameRecordID(gameRecordID):
     conn.close()
     return results
 
+def deleteMonsterRecordByGameRecordID(gameRecordID):
+    Connect()
+    sql = "DELETE FROM `MonsterRecord` WHERE GameRecordID  = %d" % (
+        gameRecordID)
+    cursor.execute(sql)
+    conn.commit()
+    cursor.close()
+    conn.close()
+
+def insertMonsterRecord(gameRecordID, monstergroup):
+    conn = sqlite3.connect('pythontut.db')
+    cursor = conn.cursor()
+    for monsterSprite in monstergroup:
+        sql = "INSERT INTO `MonsterRecord` (GameRecordID ,MosterID ,CurrentHP ,CurrentX ,CurrentY) VALUES(%d, '%d', %d, %d, %d)" % (
+            gameRecordID, monsterSprite.monsterData.ID, monsterSprite.currentHP, monsterSprite.X, monsterSprite.Y)
+        cursor.execute(sql)
+    conn.commit()
+    cursor.close()
+    conn.close()
+    return cursor.lastrowid
 
 def getAllMonster():
     Connect()

@@ -84,11 +84,11 @@ player = CharacterSprite(gameRecord, characterType)
 player_group.add(player)
 
 # 初始化food精靈組
-for n in range(1, 2):
+for n in range(1, 3):
     food = MonsterSprite(monsters[1])
     # food.position = random.randint(0, 780), random.randint(0, 580)
     monster_group.add(food)
-
+deleteMonsterRecordByGameRecordID(gameRecord.ID)
 # 提示訊息
 hintDataList = []
 
@@ -179,10 +179,11 @@ while not game_over:
                 print(player.getAttack())
                 attack = player.getAttack()
                 nearMonster.currentHP -= attack
-                hintDataList.append(HintData('勇者對怪物造成傷害'+str(attack)))
+                hintDataList.append(HintData('勇者對怪物造成傷害' + str(attack)))
                 if nearMonster.currentHP <= 0:
                     monster_group.remove(attacker)
-                    hintDataList.append(HintData(nearMonster.monsterData.name + '怪物死亡'))
+                    hintDataList.append(
+                        HintData(nearMonster.monsterData.name + '怪物死亡'))
         # print(nearMonster)
         # if attacker != None:
         #     if pygame.sprite.collide_circle_ratio(0.65)(player, attacker):
@@ -210,9 +211,8 @@ while not game_over:
     pygame.draw.rect(screen, (100, 200, 100, 180), Rect(300, 570, 200, 25), 2)
 
     # 顯示提示
-    hintDataListSize =   - 1
-    for i in range(0,len(hintDataList)):
-        print_text(font_small, 400, (i+1) * 100, hintDataList[i].text)
+    for i in range(0, len(hintDataList)):
+        print_text(font_small, 400, (i + 1) * 100, hintDataList[i].text)
     if game_over:
         print('game over')
 
