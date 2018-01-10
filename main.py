@@ -4,74 +4,108 @@ import time
 import random
 import math
 import pygame
+import colors
+import sqliteHelper
 from pygame.locals import *
 from utils import *
 from models import *
 from sqliteHelper import *
-
-
-def calc_velocity(direction, vel=1.0):
-    velocity = Point(0, 0)  # 速度
-    if direction == 0:  # 上
-        velocity.y = -vel
-    elif direction == 1:  # 右上
-        velocity.x = vel
-        velocity.y = -vel
-    elif direction == 2:  # 右
-        velocity.x = vel
-    elif direction == 3:  # 右下
-        velocity.x = vel
-        velocity.y = vel
-    elif direction == 4:  # 下
-        velocity.y = vel
-    elif direction == 5:  # 右
-        velocity.x = -vel
-        velocity.y = vel
-    elif direction == 6:  # 左
-        velocity.x = -vel
-    elif direction == 7:  # 右
-        velocity.x = -vel
-        velocity.y = -vel
-    return velocity
+from gameMenu import *
+from TkinterHelper import *
 
 
 pygame.init()
+pygame.mixer.init()  # 撥放音樂運行之前需要初始化
 screen = pygame.display.set_mode((800, 600))
 pygame.display.set_caption("RPG")
-font = pygame.font.Font(None, 36)
+font = pygame.font.Font("fonts/msjh.ttf", 36)
+font_small = pygame.font.Font("fonts/msjh.ttf", 14)
 timer = pygame.time.Clock()
 
-monsters = getAllCharacterType()
+menu_state = 1
+game_over = False
+ID = 0
+while menu_state != 0:
+    # 主畫面
+    if menu_state == 1:
+        print('主畫面')
+        position = enterMenu(pygame, screen, font, timer)
+        print('position', position)
+        menu_state = position + 2
+        print('menu_state', menu_state)
+    # 新遊戲
+    elif menu_state == 2:
+        print('新遊戲')
+        ID = enterNewGame(pygame, screen, font, timer)
+        if ID == -1:
+            menu_state = 1
+        else:
+            editBox = TKEditBox('請輸入名字')
+            editBox.loop()
+            print(editBox.NAME.get())
+            ID = sqliteHelper.insertGameRecord(ID, editBox.NAME.get())
+            menu_state = 0
+    # 載入遊戲
+    elif menu_state == 3:
+        print('載入遊戲')
+        ID = enterLoadGame(pygame, screen, font, timer)
+        print(ID)
+        if ID == -1:
+            menu_state = 1
+        else:
+            menu_state = 0
+    # 排行榜
+    elif menu_state == 4:
+        print('排行榜')
+        position = enterLoadRank(pygame, screen, font, timer)
+        if position == -1:
+            menu_state = 1
+    # 離開
+    elif menu_state == 5:
+        menu_state = 0
+        print('離開')
+        game_over = True
+
+monsters = getAllMonster()
 # 讀取遊戲紀錄
-gameRecord = getGameRecordByID(1)
+gameRecord = getGameRecordByID(ID)
 # 讀取腳色資料
 characterType = getCharacterTypedByID(gameRecord.characterTypeID)
-
-print(characterType.name)
-
-print(monsters[0])
-
 # 創建精靈組
-player_group = pygame.sprite.Group()
-food_group = pygame.sprite.Group()
+playerGroup = pygame.sprite.Group()
+monsterGroup = pygame.sprite.Group()
 
 # 初始化玩家精靈組
 player = CharacterSprite(gameRecord, characterType)
-player_group.add(player)
+playerGroup.add(player)
 
-# 初始化food精靈組
-for n in range(1, 10):
-    food = MySprite()
-    food.load("images/food_low.png", 35, 35, 1)
-    food.position = random.randint(0, 780), random.randint(0, 580)
-    food_group.add(food)
+#載入紀錄怪物
+monsterRecordList = getMonsterRecordByGameRecordID(gameRecord.ID)
+for monsterRecord in monsterRecordList:
+    monster = getMonsterByID(monsterRecord.mosterID)
+    monsterSprite = MonsterSprite(monster, monsterRecord)
+    monsterGroup.add(monsterSprite)
 
-game_over = False
+if len(monsterGroup.sprites()) == 0:
+    # 重新生成怪物
+    for n in range(1, 10):
+        index = random.randint(0, len(monsters) - 1)
+        monsterSprite = MonsterSprite(monsters[index], None)
+        monsterGroup.add(monsterSprite)
+# 提示訊息
+hintDataList = []
+infoList = []
+hpList = []
+
 player_moving = False
-player_health = 0
+hp_count = 0
 time = 0
+key_space_pressing = False
+key_tab_pressing = False
+level = player.getLevel()
 
-while True:
+while not game_over:
+    isAttack = False
     timer.tick(30)
     time = time + 1
     ticks = pygame.time.get_ticks()
@@ -80,33 +114,47 @@ while True:
         if event.type == QUIT:
             pygame.quit()
             sys.exit()
+        elif event.type == pygame.KEYUP:
+            if key_space_pressing:
+                key_space_pressing = False
+            elif key_tab_pressing:
+                key_tab_pressing = False
+                updateGameRecord(gameRecord.ID, player)
+                deleteMonsterRecordByGameRecordID(gameRecord.ID)
+                insertMonsterRecord(gameRecord.ID, monsterGroup)
+                hintDataList.append(HintData('存檔成功'))
+
     keys = pygame.key.get_pressed()
+
+    if keys[K_SPACE]:
+        if not key_space_pressing:
+            print('attack')
+            key_space_pressing = True
+            isAttack = True
+            playMusic(pygame, 'music/swing.mp3')
+    if keys[K_TAB]:
+        if not key_tab_pressing:
+            key_tab_pressing = True
     if keys[K_ESCAPE]:
-        sys.exit()
-    elif keys[K_UP] or keys[K_w]:
+        game_over = True
+        # sys.exit()
+
+    elif keys[K_DOWN] or keys[K_s]:
         player.direction = 0
         player_moving = True
-    elif keys[K_e]:
+
+    elif keys[K_LEFT] or keys[K_a]:
         player.direction = 1
         player_moving = True
+
     elif keys[K_RIGHT] or keys[K_d]:
         player.direction = 2
         player_moving = True
-    elif keys[K_c]:
+
+    elif keys[K_UP] or keys[K_w]:
         player.direction = 3
         player_moving = True
-    elif keys[K_DOWN] or keys[K_s]:
-        player.direction = 4
-        player_moving = True
-    elif keys[K_z]:
-        player.direction = 5
-        player_moving = True
-    elif keys[K_LEFT] or keys[K_a]:
-        player.direction = 6
-        player_moving = True
-    elif keys[K_q]:
-        player.direction = 7
-        player_moving = True
+
     else:
         player_moving = False
 
@@ -126,7 +174,7 @@ while True:
             player.velocity.y *= 3
 
         # 更新玩家精靈組
-        player_group.update(ticks, 50)
+        playerGroup.update(ticks, 50)
 
         # 移動玩家
         if player_moving:
@@ -134,40 +182,114 @@ while True:
             player.Y += player.velocity.y
             if player.X < -10:
                 player.X = -10
-            elif player.X > 800:
-                player.X = 800
+            elif player.X > 780:
+                player.X = 780
             if player.Y < -10:
                 player.Y = -10
-            elif player.Y > 600:
-                player.Y = 600
+            elif player.Y > 580:
+                player.Y = 580
 
-        # 檢測玩家是否與食物衝突，是否吃到果實
         attacker = None
-        attacker = pygame.sprite.spritecollideany(player, food_group)
-        if attacker != None:
-            if pygame.sprite.collide_circle_ratio(0.65)(player, attacker):
-                player_health += 50
-                food_group.remove(attacker)
-        if player_health > 100:
-            player_health = 100
-        # 更新食物精靈組
-        food_group.update(ticks, 50)
+        attacker = monsterCanAttack(player, monsterGroup.sprites())
+        if isAttack:
+            if attacker != None:
+                print(player.getAttack())
+                attack = player.getAttack()
+                attacker.currentHP -= attack
+                hintDataList.append(
+                    HintData(player.gameRecord.characterName + '對怪物造成傷害' + str(attack)))
+                if attacker.currentHP <= 0:
+                    player.addEXP(attacker.getEXP(level))
+                    monsterGroup.remove(attacker)
+                    hintDataList.append(
+                        HintData(attacker.monsterData.name + '死亡 獲得' + str(attacker.getEXP(level)) + '經驗值'))
+                    new_level = player.getLevel()
+                    if(level != new_level):
+                        level = new_level
+                        player.setCurrentHP(player.getMaxHP())
+                        hintDataList.append(HintData('恭喜提升等級至' + str(level)))
+                    if len(monsterGroup.sprites()) == 0:
+                        # 重新生成怪物
+                        for n in range(1, 10):
+                            index = random.randint(0, len(monsters) - 1)
+                            monsterSprite = MonsterSprite(
+                                monsters[index], None)
+                            monsterGroup.add(monsterSprite)
 
-        if len(food_group) == 0:
-            game_over = True
+        if player.hurtCD > 0:
+            player.hurtCD -= 1
+        player_HP = player.getMaxHP()
+        player_currentHP = player.getCurrentHP()
+        nearMonster = pygame.sprite.spritecollideany(player, monsterGroup)
+        # print(nearMonster)
+        if nearMonster != None:
+            if pygame.sprite.collide_circle_ratio(0.65)(player, nearMonster):
+                if player.hurtCD == 0:
+                    player_currentHP -= int(nearMonster.monsterData.attack)
+                    player.hurtCD = 50
+                    hintDataList.append(HintData(nearMonster.monsterData.name + "對" +
+                                                 player.gameRecord.characterName + "造成傷害" + nearMonster.monsterData.attack))
+        if player_currentHP != player_HP:
+            hp_count = player_currentHP / player_HP
+            hpList.append(TextData(350, 570, str(player_HP) +
+                                   " / " + str(player_currentHP), colors.white))
+        else:
+            hp_count = 1
+            hpList.append(TextData(350, 570, str(player_HP) +
+                                   " / " + str(player_currentHP), colors.white))
+        player.setCurrentHP(player_currentHP)
+        # 更新精靈組
+        monsterGroup.update(ticks, 50)
+
+        # if len(monster_group) == 0:
+        #     pass
+        #     game_over = True
+
+    # 人物當前資訊
+    attack = player.getAttack()
+
     # 清除畫面
     screen.fill((50, 50, 100))
 
     # 繪製精靈
-    food_group.draw(screen)
-    player_group.draw(screen)
+    monsterGroup.draw(screen)
+    playerGroup.draw(screen)
+
+    # 繪製玩家資訊
+    print_text(font, 50, 500, player.characterTypeData.name, colors.white)
+    print_text(font, 30, 550, "LV." +
+               str(level), colors.white)
+    print_text(font, 130, 550, "Attack:" + str(attack), colors.white)
 
     # 繪製玩家血量條
-    pygame.draw.rect(screen, (50, 150, 50, 180),
-                     Rect(300, 570, player_health * 2, 25))
     pygame.draw.rect(screen, (100, 200, 100, 180), Rect(300, 570, 200, 25), 2)
 
-    if game_over:
-        print('game over')
+    # 顯示提示
+    end = 0
+    hintcount = 0
+    if len(hintDataList) <= 10:
+        end = 0
+    else:
+        end = len(hintDataList) - 10
+    for i in range(end, len(hintDataList)):
+        print_text(font_small, 560, 390 + (hintcount + 1)
+                   * 18, hintDataList[i].text)
+        hintcount += 1
+        if hintcount == 10:
+            hintcount = 0
 
+    if player_currentHP == player_HP:
+        pygame.draw.rect(screen, (100, 200, 100, 180),
+                         Rect(300, 570, 200, 25), 0)
+    else:
+        pygame.draw.rect(screen, (50, 150, 50, 180),
+                         Rect(300, 570, 200 * hp_count, 25), 0)
+    print_text(font_small, 350, 570, str(player.getMaxHP()) +
+               " / " + str(player.getCurrentHP()), colors.white)
+    if player.getCurrentHP() <= 0:
+        game_over = True
+    if game_over:
+        print_text(font, 290, 250, "Game Over!!!", colors.red)
     pygame.display.update()
+
+pygame.time.delay(1500)
