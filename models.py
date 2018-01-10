@@ -25,6 +25,7 @@ class CharacterSprite(pygame.sprite.Sprite):
         fileNmae = 'images/character/%s' % (characterTypeData.imageName)
         self.load(fileNmae, 32, 32, 3)
         self.position = (gameRecord.currentX, gameRecord.currentY)
+        self.hurtCD = 0
         #self.direction = gameRecord.currentDirection
 
     # X property
@@ -48,6 +49,15 @@ class CharacterSprite(pygame.sprite.Sprite):
     def getAttack(self):
         return (self.characterTypeData.initAttack + self.gameRecord.getlevel() * self.characterTypeData.bonusAttack)
         
+    def getMaxHP(self):
+        return (self.characterTypeData.initHP + self.gameRecord.getlevel() * self.characterTypeData.bonusHP)
+
+    def getCurrentHP(self):
+        return self.gameRecord.currentHP
+
+    def setCurrentHP(self,HP):
+        self.gameRecord.currentHP = HP
+
     def load(self, filename, width, height, columns):
         self.master_image = pygame.image.load(filename).convert_alpha()
         self.frame_width = width
